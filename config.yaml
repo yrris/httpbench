@@ -1,0 +1,155 @@
+# HTTP Benchmark Tool 配置文件
+
+# 目标配置
+target:
+  url: "https://api.example.com/endpoint"
+  method: "GET"
+  timeout: 30s
+  headers:
+    User-Agent: "HTTPBench/1.0"
+    Accept: "application/json"
+  body: ""
+
+# 负载配置
+load:
+  concurrency: 100
+  duration: 60s
+  total_requests: 0 # 0表示基于时间
+  rate_limit: 0 # 0表示无限制
+
+  # 负载模式: constant, ramp_up, burst
+  load_pattern: "constant"
+
+  # 渐进式负载配置
+  ramp_up:
+    enabled: false
+    start_concurrency: 10
+    end_concurrency: 100
+    duration: 30s
+    steps: 10
+
+  # 突发负载配置
+  burst_mode:
+    enabled: false
+    base_concurrency: 50
+    burst_concurrency: 200
+    burst_duration: 10s
+    burst_interval: 30s
+
+# 协议配置
+protocol:
+  http2_enabled: false
+  http3_enabled: false
+  keep_alive: true
+  idle_timeout: 90s
+
+  # HTTP/2 配置
+  http2:
+    max_concurrent_streams: 100
+    initial_window_size: 65535
+    max_frame_size: 16384
+
+  # HTTP/3 配置
+  http3:
+    max_stream_buffer: 1048576 # 1MB
+    handshake_timeout: 10s
+
+# 请求配置
+request:
+  headers:
+    Content-Type: "application/json"
+
+  cookies:
+    - name: "session_id"
+      value: "{{random_uuid}}"
+      domain: "example.com"
+      path: "/"
+      secure: true
+      http_only: true
+
+  # 模板配置
+  template:
+    enabled: true
+    variables:
+      api_version: "v1"
+      region: "us-east-1"
+    functions:
+      - "random_int"
+      - "timestamp"
+      - "random_uuid"
+
+  # 动态请求体
+  dynamic_body: true
+  body_template: |
+    {
+      "user_id": {{worker_id}},
+      "timestamp": {{timestamp}},
+      "request_id": "{{random_uuid}}",
+      "data": "{{random_string 50}}",
+      "note": "支持 {{worker_id}} 或 {{.worker_id}} 两种语法"
+    }
+
+# 验证配置
+validation:
+  status_codes:
+    - 200
+    - 201
+
+  content_patterns:
+    - '"status":"success"'
+    - '"data":\s*\{'
+
+  response_time_max: 5s
+
+  header_validation:
+    Content-Type: "application/json"
+
+  body_validation:
+    min_size: 10
+    max_size: 1048576 # 1MB
+    contains:
+      - "success"
+    not_contains:
+      - "error"
+      - "exception"
+
+# TLS配置
+tls:
+  enabled: true
+  insecure_skip_verify: false
+  min_version: "TLS1.2"
+  max_version: "TLS1.3"
+
+  cipher_suites:
+    - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+    - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+
+  # 客户端证书(双向认证)
+  mutual_tls: false
+  client_cert_file: ""
+  client_key_file: ""
+  ca_file: ""
+
+# 输出配置
+output:
+  format: "console" # console, json, csv
+  report_file: ""
+
+  # 实时监控
+  realtime_monitor: true
+  monitor_interval: 1s
+
+  verbose: false
+  debug: false
+
+# 分布式配置
+distributed:
+  enabled: false
+  worker_mode: false
+  master_address: ""
+  worker_addresses:
+    - "worker1.example.com:50051"
+    - "worker2.example.com:50051"
+
+  sync_interval: 1s
+  grpc_port: 50051
