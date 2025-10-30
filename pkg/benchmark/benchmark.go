@@ -420,7 +420,7 @@ func (b *Benchmark) createRequest(ctx context.Context, workerID int) (*http.Requ
 	}
 
 	if err != nil {
-		// fmt.Printf("err: %e\n", err)
+		fmt.Printf("err: %e\n", err)
 		return nil, err
 	}
 
