@@ -1,0 +1,10 @@
+name: Test
+on: [pull_request]
+jobs:
+  fail-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: This step will fail
+        run: |
+          echo "This check is designed to fail for the YOLO achievement."
+          exit 1
