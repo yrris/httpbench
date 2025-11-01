@@ -1,6 +1,6 @@
 # HTTP Benchmark Tool
 
-🚀 一个高性能 Go 语言 HTTP 基准测试工具,支持 HTTP/1.1、HTTP/2 和 HTTP/3 协议。
+🚀 一个高性能 Go 语言 HTTP 基准测试工具,支持 HTTP/1.1、HTTP/2 和 HTTP/3 协议
 
 ## ✨ 核心特性
 
